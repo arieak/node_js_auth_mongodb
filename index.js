@@ -156,7 +156,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
 
                                             //sendMail(email, subject, html);
 
-                                            response.status(200).json('Please check your email and follow the ' +
+                                            response.json('Please check your email and follow the ' +
                                                 'link to complete the registration');
                                             console.log('Confirmation mail have been sent');
                                         }
