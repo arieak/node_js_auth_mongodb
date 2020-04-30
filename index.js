@@ -125,51 +125,51 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                 response.status(400).json('Error occurs during registration');
                                 console.log(error);
                             } else {
-                        //         //send confirmation mail
-                        //         // async email
-                        //         console.log('Test3');
-                        //         jwt.sign(
-                        //             {
-                        //                 userId: res.insertedId,
-                        //                 //userId: user._id,
-                        //                 //email: email,
-                        //             },
-                        //             EMAIL_SECRET,
-                        //             {
-                        //                 expiresIn: '1d',
-                        //             },
-                        //             (err, emailToken) => {
-                        //                 if (err) {
-                        //                     console.log(err);
-                        //                     response.json(err);
-                        //                 }
-                        //                 else {
-                        //                     console.log('Test4');
-                        //                     //const url = `http://localhost:3000/confirmation/${emailToken}`;
-                        //                     const url = `http://${IP_ADDRESS}:3000/confirmation/${emailToken}`;
-                        //
-                        //                     var subject = 'Confirm you registration to Buddy&Soul Monitor';
-                        //                     var html = `Hi ${name},
-                        //                             <br>
-                        //                             Please click on the <a href="${url}">link</a> to confirm your email.
-                        //                             <br>
-                        //                             <br>
-                        //                             Buddy&Soul Monitor`;
-                        //
-                        //                     //sendMail(email, subject, html);
-                        //
-                        //                     console.log('Test6');
-                        //
-                        //                     response.status(200).json('Please check your email and follow the ' +
-                        //                         'link to complete the registration');
-                        //                     console.log('Confirmation mail have been sent');
-                        //                 }
-                        //             },
-                        //         );
-                        //     }
-                        // })
+                                // //send confirmation mail
+                                // // async email
+                                // console.log('Test3');
+                                // jwt.sign(
+                                //     {
+                                //         userId: res.insertedId,
+                                //         //userId: user._id,
+                                //         //email: email,
+                                //     },
+                                //     EMAIL_SECRET,
+                                //     {
+                                //         expiresIn: '1d',
+                                //     },
+                                //     (err, emailToken) => {
+                                //         if (err) {
+                                //             console.log(err);
+                                //             response.json(err);
+                                //         }
+                                //         else {
+                                //             console.log('Test4');
+                                //             //const url = `http://localhost:3000/confirmation/${emailToken}`;
+                                //             const url = `http://${IP_ADDRESS}:3000/confirmation/${emailToken}`;
+                                //
+                                //             var subject = 'Confirm you registration to Buddy&Soul Monitor';
+                                //             var html = `Hi ${name},
+                                //                     <br>
+                                //                     Please click on the <a href="${url}">link</a> to confirm your email.
+                                //                     <br>
+                                //                     <br>
+                                //                     Buddy&Soul Monitor`;
+                                //
+                                //             //sendMail(email, subject, html);
+                                //
+                                //             console.log('Test6');
+                                //
+                                //             response.status(200).json('Please check your email and follow the ' +
+                                //                 'link to complete the registration');
+                                //             console.log('Confirmation mail have been sent');
+                                //         }
+                                //     },
+                                // );
                                 response.json('success');
-                                console.log('success')
+                                console.log('success');
+                            }
+                        })
                 }
             })
         });
