@@ -11,7 +11,8 @@ var path = require('path');
 
 require("dotenv").config();
 
-const IP_ADDRESS = '192.168.14.183'
+const IP_ADRESS = '3.135.240.60'
+//const IP_ADDRESS = '192.168.14.183'
 const EMAIL_SECRET = 'asdf1093KMnzxcvnkljvasdu09123nlasdasdf';
 
 const transporter = nodemailer.createTransport({
