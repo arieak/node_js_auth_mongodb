@@ -387,7 +387,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                     }).then(() => {
                                 console.log("Password has been changed");
                                 response.json({
-                                    //status: 'success',
+                                    status: 'success',
                                     message: 'Success! Your password has been changed.'
                                 });
                             })
