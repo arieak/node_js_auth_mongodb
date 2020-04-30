@@ -109,6 +109,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
             var db = client.db('buddy&soulmonitor');
 
             console.log('Test');
+            console.log('username: '+ process.env.user + 'password: ' + process.env.pass);
 
             //Check exists email
             db.collection('user')
