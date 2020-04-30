@@ -56,6 +56,8 @@ function checkHashPassword(userPassword, salt) {
 }
 
 function sendMail(email, subject, html) {
+    console.log('Test 5');
+    console.log('username: '+ process.env.user + 'password: ' + process.env.pass);
     transporter.sendMail({
         from: 'buddynsoulmonitor@gmail.com',
         to: email,
@@ -154,9 +156,9 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                                     <br>
                                                     Buddy&Soul Monitor`;
 
-                                            //sendMail(email, subject, html);
+                                            sendMail(email, subject, html);
 
-                                            response.json('Please check your email and follow the ' +
+                                            response.status(200).json('Please check your email and follow the ' +
                                                 'link to complete the registration');
                                             console.log('Confirmation mail have been sent');
                                         }
