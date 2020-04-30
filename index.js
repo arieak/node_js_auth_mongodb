@@ -125,6 +125,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                             } else {
                                 //send confirmation mail
                                 // async email
+                                console.log('Test3');
                                 jwt.sign(
                                     {
                                         userId: res.insertedId,
@@ -141,6 +142,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                             response.json(err);
                                         }
                                         else {
+                                            console.log('Test4');
                                             //const url = `http://localhost:3000/confirmation/${emailToken}`;
                                             const url = `http://${IP_ADDRESS}:3000/confirmation/${emailToken}`;
 
