@@ -11,7 +11,7 @@ var path = require('path');
 
 require("dotenv").config();
 
-const IP_ADRESS = '3.135.240.60'
+const IP_ADDRESS = '3.135.240.60'
 //const IP_ADDRESS = '192.168.14.183'
 const EMAIL_SECRET = 'asdf1093KMnzxcvnkljvasdu09123nlasdasdf';
 
@@ -56,8 +56,6 @@ function checkHashPassword(userPassword, salt) {
 }
 
 function sendMail(email, subject, html) {
-    console.log('Test 5');
-    console.log('username: '+ process.env.user + 'password: ' + process.env.pass);
     transporter.sendMail({
         from: 'buddynsoulmonitor@gmail.com',
         to: email,
@@ -108,8 +106,6 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
             };
             var db = client.db('buddy&soulmonitor');
 
-            console.log('Test');
-
             //Check exists email
             db.collection('user')
                 .find({'email': email}).count(function (err, number) {
@@ -117,7 +113,6 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                     response.json('Email already exists');
                     console.log('Email already exists');
                 } else {
-                    console.log('Test2');
                     //Insert data
                     db.collection('user')
                         .insertOne(insertJson, function (error, res) {
@@ -125,49 +120,43 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                 response.status(400).json('Error occurs during registration');
                                 console.log(error);
                             } else {
-                                // //send confirmation mail
-                                // // async email
-                                // console.log('Test3');
-                                // jwt.sign(
-                                //     {
-                                //         userId: res.insertedId,
-                                //         //userId: user._id,
-                                //         //email: email,
-                                //     },
-                                //     EMAIL_SECRET,
-                                //     {
-                                //         expiresIn: '1d',
-                                //     },
-                                //     (err, emailToken) => {
-                                //         if (err) {
-                                //             console.log(err);
-                                //             response.json(err);
-                                //         }
-                                //         else {
-                                //             console.log('Test4');
-                                //             //const url = `http://localhost:3000/confirmation/${emailToken}`;
-                                //             const url = `http://${IP_ADDRESS}:3000/confirmation/${emailToken}`;
-                                //
-                                //             var subject = 'Confirm you registration to Buddy&Soul Monitor';
-                                //             var html = `Hi ${name},
-                                //                     <br>
-                                //                     Please click on the <a href="${url}">link</a> to confirm your email.
-                                //                     <br>
-                                //                     <br>
-                                //                     Buddy&Soul Monitor`;
-                                //
-                                //             //sendMail(email, subject, html);
-                                //
-                                //             console.log('Test6');
-                                //
-                                //             response.status(200).json('Please check your email and follow the ' +
-                                //                 'link to complete the registration');
-                                //             console.log('Confirmation mail have been sent');
-                                //         }
-                                //     },
-                                // );
-                                response.json('success');
-                                console.log('success');
+                                //send confirmation mail
+                                // async email
+                                jwt.sign(
+                                    {
+                                        userId: res.insertedId,
+                                        //userId: user._id,
+                                        //email: email,
+                                    },
+                                    EMAIL_SECRET,
+                                    {
+                                        expiresIn: '1d',
+                                    },
+                                    (err, emailToken) => {
+                                        if (err) {
+                                            console.log(err);
+                                            response.json(err);
+                                        }
+                                        else {
+                                            //const url = `http://localhost:3000/confirmation/${emailToken}`;
+                                            const url = `http://${IP_ADDRESS}:3000/confirmation/${emailToken}`;
+
+                                            var subject = 'Confirm you registration to Buddy&Soul Monitor';
+                                            var html = `Hi ${name},
+                                                    <br>
+                                                    Please click on the <a href="${url}">link</a> to confirm your email.
+                                                    <br>
+                                                    <br>
+                                                    Buddy&Soul Monitor`;
+
+                                            sendMail(email, subject, html);
+
+                                            response.status(200).json('Please check your email and follow the ' +
+                                                'link to complete the registration');
+                                            console.log('Confirmation mail have been sent');
+                                        }
+                                    },
+                                );
                             }
                         })
                 }
