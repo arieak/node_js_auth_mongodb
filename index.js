@@ -154,7 +154,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                                     <br>
                                                     Buddy&Soul Monitor`;
 
-                                            sendMail(email, subject, html);
+                                            //sendMail(email, subject, html);
 
                                             response.status(200).json('Please check your email and follow the ' +
                                                 'link to complete the registration');
