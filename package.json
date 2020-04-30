@@ -1,0 +1,21 @@
+{
+  "name": "node_js_auth_mongodb",
+  "version": "1.0.0",
+  "description": "Login with Nodejs and MongoDB to the Buddy&SoulMonitor DB",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Arie & Lyaure",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "crypto": "^1.0.1",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^3.5.6",
+    "nodemailer": "^6.4.6",
+    "path": "^0.12.7"
+  }
+}
