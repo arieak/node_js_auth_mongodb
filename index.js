@@ -156,7 +156,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                                     <br>
                                                     Buddy&Soul Monitor`;
 
-                                            sendMail(email, subject, html);
+                                            //sendMail(email, subject, html);
 
                                             console.log('Test6');
 
