@@ -11,8 +11,7 @@ var path = require('path');
 
 require("dotenv").config();
 
-const IP_ADDRESS = '3.135.240.60'
-//const IP_ADDRESS = '192.168.14.183'
+const IP_ADDRESS = '192.168.14.183'
 const EMAIL_SECRET = 'asdf1093KMnzxcvnkljvasdu09123nlasdasdf';
 
 const transporter = nodemailer.createTransport({
@@ -55,13 +54,14 @@ function checkHashPassword(userPassword, salt) {
     return passwordData;
 }
 
-function sendMail(email, subject, html) {
-    transporter.sendMail({
-        from: 'buddynsoulmonitor@gmail.com',
+async function sendMail(email, subject, html, response) {
+    let info = await transporter.sendMail({
+        from: '"Buddy&Soul Monitor" <buddynsoulmonitor@gmail.com>',
         to: email,
         subject: subject,
         html: html
     });
+    console.log(info);
 }
 
 //Create Express Service
@@ -102,6 +102,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                 'salt': salt,
                 'name': name,
                 'registration_date': registration_date,
+                'reset_password': false,
                 'confirmed': false
             };
             var db = client.db('buddy&soulmonitor');
@@ -132,7 +133,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                     {
                                         expiresIn: '1d',
                                     },
-                                    (err, emailToken) => {
+                                    async (err, emailToken) => {
                                         if (err) {
                                             console.log(err);
                                             response.json(err);
@@ -144,12 +145,12 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                             var subject = 'Confirm you registration to Buddy&Soul Monitor';
                                             var html = `Hi ${name},
                                                     <br>
-                                                    Please click on the <a href="${url}">link</a> to confirm your email.
+                                                    Please click on the <a href="${url}">link</a> to confirm your registration.
                                                     <br>
                                                     <br>
                                                     Buddy&Soul Monitor`;
 
-                                            sendMail(email, subject, html);
+                                            await sendMail(email, subject, html, response);
 
                                             response.status(200).json('Please check your email and follow the ' +
                                                 'link to complete the registration');
@@ -233,27 +234,38 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                         } else {
                             if (user.confirmed) {
                                 console.log('Mail has been already confirmed');
-                                response.json('Mail has been already confirmed');
+                                response.sendFile(path.join(__dirname + '/alreadyConfirmationMessage.html'));
+                                //response.json('Mail has been already confirmed');
                             } else {
                                 db.collection('user')
                                     .updateOne({'_id': ObjectId(userId)}, //filter
                                         {$set: {'confirmed': true}}
                                     ).then(() => {
                                     db.collection('monitor')
-                                        .insertOne({'email': user.email}, function (error, res) {
+                                        .insertOne({'email': user.email}, async function (error, res) {
                                             if (err) {
                                                 console.log(err)
                                                 response.json("Error new user in monitor")
                                             }
+
+                                            var subject = 'Welcome to Buddy&Soul Monitor';
+                                            var html = `Hi ${user.name},
+                                                    <br> Your account has been activated.<br><br>
+                                                    Buddy&Soul Monitor`;
+
+                                            await sendMail(user.email, subject, html, response);
+                                            //redirect to html page
+                                            response.sendFile(path.join(__dirname + '/confirmationMessage.html'));
                                         })
                                     console.log("Db updated");
                                 })
                                     .catch((err) => {
                                         console.log(err);
+                                        response.json('Error');
                                     })
 
                                 console.log('Mail confirmed');
-                                response.json('Mail confirmed');
+                                //response.json('Mail confirmed');
                             }
 
                         }
@@ -300,7 +312,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                 {
                                     expiresIn: '1d',
                                 },
-                                (err, emailToken) => {
+                                async (err, emailToken) => {
                                     //const url = `http://localhost:3000/confirmation/${emailToken}`;
                                     //const url = `http://192.168.14.183:3000/confirmation/${emailToken}`;
                                     const url = `http://${IP_ADDRESS}:3000/enterpassword/${emailToken}`;
@@ -319,8 +331,24 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                                 <br>
                                                 Buddy&Soul Monitor`;
 
-                                    sendMail(email, subject, html);
+                                    await sendMail(email, subject, html);
 
+                                    db.collection('user')
+                                        .updateOne({'_id': ObjectId(user._id)}, //filter
+                                            {
+                                                $set:
+                                                    {'reset_password': true}
+                                            }).then(() => {
+                                        console.log("Password has been changed");
+                                        response.json({
+                                            status: 'success',
+                                            message: 'Success! Your password has been changed.'
+                                        });
+                                    })
+                                        .catch((err) => {
+                                            console.log(err);
+                                            response.json('An error occurred during resetting password');
+                                        })
                                     response.json('Reset mail have been sent');
                                     console.log('Reset mail have been sent');
                                 },
@@ -343,9 +371,18 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                 const decoded = jwt.verify(request.params.token, EMAIL_SECRET);
                 var userId = decoded.userId
 
-                //response.sendFile('/resetPassword.html');
-                response.sendFile(path.join(__dirname + '/resetPassword.html'));
+                var db = client.db('buddy&soulmonitor');
 
+                // Check resetPassword value
+                db.collection('user')
+                    .findOne({'_id': ObjectID(userId)}, function (err, user) {
+                        if (user.reset_password == false) {
+                            response.sendFile(path.join(__dirname + '/alreadyResetPassword.html'));
+                        }
+                        else {
+                            response.sendFile(path.join(__dirname + '/resetPassword.html'));
+                        }
+                    })
             } catch (e) {
                 console.log(e);
                 response.json('error');
@@ -382,7 +419,8 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                         $set:
                                             {
                                                 'password': new_password,
-                                                'salt': salt
+                                                'salt': salt,
+                                                'reset_password': false,
                                             }
                                     }).then(() => {
                                 console.log("Password has been changed");
