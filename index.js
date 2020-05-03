@@ -11,7 +11,7 @@ var path = require('path');
 
 require("dotenv").config();
 
-const IP_ADDRESS = '192.168.14.183'
+const IP_ADDRESS = '3.135.240.60'
 const EMAIL_SECRET = 'asdf1093KMnzxcvnkljvasdu09123nlasdasdf';
 
 const transporter = nodemailer.createTransport({
@@ -131,7 +131,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                     },
                                     EMAIL_SECRET,
                                     {
-                                        expiresIn: '1d',
+                                        expiresIn: '2h',
                                     },
                                     async (err, emailToken) => {
                                         if (err) {
@@ -145,7 +145,10 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                             var subject = 'Confirm you registration to Buddy&Soul Monitor';
                                             var html = `Hi ${name},
                                                     <br>
+                                                    <br>
                                                     Please click on the <a href="${url}">link</a> to confirm your registration.
+                                                    <br>
+                                                    The link will expire after 2 hours.
                                                     <br>
                                                     <br>
                                                     Buddy&Soul Monitor`;
@@ -250,7 +253,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
 
                                             var subject = 'Welcome to Buddy&Soul Monitor';
                                             var html = `Hi ${user.name},
-                                                    <br> Your account has been activated.<br><br>
+                                                    <br> <br> Your account has been activated.<br><br>
                                                     Buddy&Soul Monitor`;
 
                                             await sendMail(user.email, subject, html, response);
@@ -310,7 +313,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                 },
                                 EMAIL_SECRET,
                                 {
-                                    expiresIn: '1d',
+                                    expiresIn: '2h',
                                 },
                                 async (err, emailToken) => {
                                     //const url = `http://localhost:3000/confirmation/${emailToken}`;
@@ -318,16 +321,14 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                     const url = `http://${IP_ADDRESS}:3000/enterpassword/${emailToken}`;
 
                                     var subject = 'Password Reset Buddy&Soul Monitor';
-                                    var html = 'You are receiving this because you (or someone else) have requested' +
-                                        ' the reset of the password for your account.\n\n' +
-                                        ' Please click on the following link, or paste this' +
-                                        ' into your browser to complete the process:\n\n' +
-                                        url;
 
                                     var html = `Hi ${user.name}, 
                                                 <br>
+                                                <br>
                                                 Please click on the <a href="${url}">link</a> to reset your password.
-                                                <br> 
+                                                <br>
+                                                The link will expire after 2 hours. 
+                                                <br>
                                                 <br>
                                                 Buddy&Soul Monitor`;
 

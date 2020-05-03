@@ -19,3 +19,9 @@ h1.sub-head {
     font-weight: 200;
     font-family: sans-serif;
 }
+
+img {
+    width: auto ;
+    max-width: 100% ;
+    height: auto ;
+}
