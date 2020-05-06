@@ -155,7 +155,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                         }
                                         else {
                                             //const url = `http://localhost:3000/confirmation/${emailToken}`;
-                                            const url = `http://${IP_ADDRESS}/confirmation/${emailToken}`;
+                                            const url = `https://${IP_ADDRESS}/confirmation/${emailToken}`;
 
                                             var subject = 'Confirm you registration to Buddy&Soul Monitor';
                                             var html = `Hi ${name},
@@ -333,7 +333,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                 async (err, emailToken) => {
                                     //const url = `http://localhost:3000/confirmation/${emailToken}`;
                                     //const url = `http://192.168.14.183:3000/confirmation/${emailToken}`;
-                                    const url = `http://${IP_ADDRESS}/enterpassword/${emailToken}`;
+                                    const url = `https://${IP_ADDRESS}/enterpassword/${emailToken}`;
 
                                     var subject = 'Password Reset Buddy&Soul Monitor';
 
