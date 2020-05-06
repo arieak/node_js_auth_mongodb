@@ -10,22 +10,7 @@ var ObjectId = require('mongodb').ObjectID;
 var path = require('path');
 
 require("dotenv").config();
-const https = require('https');
-const fs = require('fs');
 
-// const options = {
-//     key: fs.readFileSync('key.pem'),
-//     cert: fs.readFileSync('cert.pem')
-// };
-
-var key = fs.readFileSync(__dirname + '/certs/selfsigned.key');
-var cert = fs.readFileSync(__dirname + '/certs/selfsigned.crt');
-var options = {
-    key: key,
-    cert: cert
-};
-
-//const IP_ADDRESS = '3.135.240.60:3000'
 const IP_ADDRESS = '3.135.240.60'
 const EMAIL_SECRET = 'asdf1093KMnzxcvnkljvasdu09123nlasdasdf';
 
@@ -155,7 +140,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                         }
                                         else {
                                             //const url = `http://localhost:3000/confirmation/${emailToken}`;
-                                            const url = `https://${IP_ADDRESS}/confirmation/${emailToken}`;
+                                            const url = `http://${IP_ADDRESS}/confirmation/${emailToken}`;
 
                                             var subject = 'Confirm you registration to Buddy&Soul Monitor';
                                             var html = `Hi ${name},
@@ -333,7 +318,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                 async (err, emailToken) => {
                                     //const url = `http://localhost:3000/confirmation/${emailToken}`;
                                     //const url = `http://192.168.14.183:3000/confirmation/${emailToken}`;
-                                    const url = `https://${IP_ADDRESS}/enterpassword/${emailToken}`;
+                                    const url = `http://${IP_ADDRESS}/enterpassword/${emailToken}`;
 
                                     var subject = 'Password Reset Buddy&Soul Monitor';
 
@@ -507,9 +492,5 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
         app.listen(3000, () => {
             console.log('Connected to MongoDB Server, WebService running on port 3000');
         })
-        // https.createServer(options, app).listen(3000, () => {
-        //     console.log(options);
-        //     console.log('Connected to MongoDB Server, WebService running on port 3000');
-        // })
     }
 })
