@@ -504,12 +504,12 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
 
 
         //Start Web Server
-        // app.listen(3000, () => {
-        //     console.log('Connected to MongoDB Server, WebService running on port 3000');
-        // })
-        https.createServer(options, app).listen(3000, () => {
-            console.log(options);
+        app.listen(3000, () => {
             console.log('Connected to MongoDB Server, WebService running on port 3000');
         })
+        // https.createServer(options, app).listen(3000, () => {
+        //     console.log(options);
+        //     console.log('Connected to MongoDB Server, WebService running on port 3000');
+        // })
     }
 })
