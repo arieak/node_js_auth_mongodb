@@ -111,7 +111,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
             db.collection('user')
                 .find({'email': email}).count(function (err, number) {
                 if (number != 0) {
-                    response.json('Email already exists');
+                    response.status(409).json('Email already exists');
                     console.log('Email already exists');
                 } else {
                     //Insert data
