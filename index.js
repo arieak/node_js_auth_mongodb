@@ -487,6 +487,106 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
             }
         });
 
+        //Send list of all confirmed users
+        app.post('/listusers/:token', (request, response, next) => {
+
+            try {
+                const decoded = jwt.verify(request.params.token, EMAIL_SECRET);
+                var admin_email = decoded.email
+
+                if (admin_email !== 'buddynsoulmonitor@gmail.com') {
+                    console.log("Not allowed")
+                    response.json('Not allowed');
+                } else {
+                    var db = client.db('buddy&soulmonitor');
+
+                    //Check exists email
+                    db.collection('user')
+                        .find({'confirmed': true}, {}).toArray(function (err, result) {
+                        var data = [];
+                        result.forEach(user => {
+                            var json_user = {
+                                'email': user.email,
+                                'name': user.name,
+                                'registration_date': user.registration_date
+                            };
+                            data.push(json_user);
+                        });
+                        console.log('List of users have been send');
+                        response.json(JSON.stringify(data));
+                    });
+                }
+
+
+            } catch (e) {
+                console.log(e);
+                response.json('error');
+            }
+
+        });
+
+        //Send data of a specific user between two different dates
+        app.post('/databetweentwodates/:token', (request, response, next) => {
+
+            try {
+                const decoded = jwt.verify(request.params.token, EMAIL_SECRET);
+                var admin_email = decoded.email
+
+                if (admin_email !== 'buddynsoulmonitor@gmail.com') {
+                    console.log("Not allowed")
+                    response.json('Not allowed');
+                } else {
+                    var db = client.db('buddy&soulmonitor');
+
+                    var post_data = request.body;
+                    var email = post_data.email;
+                    var start = post_data.start;
+                    var end = post_data.end;
+
+                    db.collection('monitor')
+                        .find({'email': email}, {}).toArray(function (err, result) {
+                        if(err) {
+                            console.log(err);
+                            response.json('error');
+                        }
+                        else {
+                            var data = [];
+                            if(result[0].data === undefined) {
+                                console.log("Still no data");
+                                response.json('Still no data');
+                            }
+                            else {
+                                if(start === '-1' && end === '-1') {
+                                    data = result[0].data;
+                                    console.log('List of users have been send');
+                                    response.json(JSON.stringify(data));
+                                }
+                                else if(start < result[0].data[0].timestamps) {
+                                    console.log('No data between these dates');
+                                    response.json("No data between these dates");
+                                }
+                                else {
+                                    (result[0].data).forEach(periodic_data => {
+                                        if(periodic_data.timestamps >= start && periodic_data.timestamps <= end) {
+                                            data.push(periodic_data);
+                                        }
+                                    });
+                                    console.log('List of users have been send');
+                                    response.json(JSON.stringify(data));
+                                }
+                            }
+                        }
+                    });
+                }
+
+
+            } catch (e) {
+                console.log(e);
+                response.json('error');
+            }
+
+        });
+
 
         //Start Web Server
         app.listen(3000, () => {
