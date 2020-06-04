@@ -204,8 +204,12 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                         },
                                         EMAIL_SECRET,
                                         (err, refreshToken) => {
-                                            //response.json('Login success');
-                                            response.json(refreshToken);
+                                            var json_to_send = {
+                                                'refreshToken': refreshToken,
+                                                'admin': user.admin,
+                                            }
+                                            response.json(json_to_send);
+                                            //response.json(refreshToken);
                                             console.log('Login success');
                                         },
                                     );
