@@ -11,7 +11,7 @@ var path = require('path');
 
 require("dotenv").config();
 
-const IP_ADDRESS = '3.135.240.60'
+const IP_ADDRESS = '3.12.111.177'
 const EMAIL_SECRET = 'asdf1093KMnzxcvnkljvasdu09123nlasdasdf';
 
 const transporter = nodemailer.createTransport({
@@ -103,7 +103,8 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                 'name': name,
                 'registration_date': registration_date,
                 'reset_password': false,
-                'confirmed': false
+                'confirmed': false,
+                'admin': false
             };
             var db = client.db('buddy&soulmonitor');
 
@@ -137,8 +138,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                         if (err) {
                                             console.log(err);
                                             response.json(err);
-                                        }
-                                        else {
+                                        } else {
                                             //const url = `http://localhost:3000/confirmation/${emailToken}`;
                                             const url = `http://${IP_ADDRESS}/confirmation/${emailToken}`;
 
@@ -379,8 +379,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                     .findOne({'_id': ObjectID(userId)}, function (err, user) {
                         if (user.reset_password == false) {
                             response.sendFile(path.join(__dirname + '/alreadyResetPassword.html'));
-                        }
-                        else {
+                        } else {
                             response.sendFile(path.join(__dirname + '/resetPassword.html'));
                         }
                     })
@@ -492,30 +491,103 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
 
             try {
                 const decoded = jwt.verify(request.params.token, EMAIL_SECRET);
-                var admin_email = decoded.email
+                var adminEmail = decoded.email
 
-                if (admin_email !== 'buddynsoulmonitor@gmail.com') {
-                    console.log("Not allowed")
-                    response.json('Not allowed');
-                } else {
-                    var db = client.db('buddy&soulmonitor');
+                var db = client.db('buddy&soulmonitor');
 
-                    //Check exists email
-                    db.collection('user')
-                        .find({'confirmed': true}, {}).toArray(function (err, result) {
-                        var data = [];
-                        result.forEach(user => {
-                            var json_user = {
-                                'email': user.email,
-                                'name': user.name,
-                                'registration_date': user.registration_date
-                            };
-                            data.push(json_user);
-                        });
-                        console.log('List of users have been send');
-                        response.json(JSON.stringify(data));
+                //Check exists email
+                db.collection('user')
+                    .findOne({'email': adminEmail}, function (err, user) {
+                            if (err) {
+                                console.log('Error');
+                                response.json("Error");
+                            }
+                            if (!user.admin) {
+                                console.log('Not allowed');
+                                response.json("Not allowed");
+                            } else {
+                                db.collection('user')
+                                    .find({'confirmed': true}, {}).toArray(function (err, result) {
+                                    var data = [];
+                                    result.forEach(user => {
+                                        var json_user = {
+                                            'email': user.email,
+                                            'name': user.name,
+                                            'registration_date': user.registration_date
+                                        };
+                                        data.push(json_user);
+                                    });
+                                    console.log('List of users have been send');
+                                    response.json(JSON.stringify(data));
+                                });
+                            }
+                        }
+                    )
+
+            } catch (e) {
+                console.log(e);
+                response.json('error');
+            }
+
+        });
+
+        //Send data of specific user between two different dates
+        app.post('/databetweentwodates/:token', (request, response, next) => {
+
+            try {
+                const decoded = jwt.verify(request.params.token, EMAIL_SECRET);
+                var adminEmail = decoded.email
+
+                var db = client.db('buddy&soulmonitor');
+
+                //Check exists email
+                db.collection('user')
+                    .findOne({'email': adminEmail}, function (err, user) {
+                        if (err) {
+                            console.log('Error');
+                            response.json("Error");
+                        }
+                        if (!user.admin) {
+                            console.log('Not allowed');
+                            response.json("Not allowed");
+                        } else {
+                            var post_data = request.body;
+                            var email = post_data.email;
+                            var start = post_data.start;
+                            var end = post_data.end;
+
+                            db.collection('monitor')
+                                .find({'email': email}, {}).toArray(function (err, result) {
+                                if (err) {
+                                    console.log(err);
+                                    response.json('error');
+                                } else {
+                                    var data = [];
+                                    if (result[0].data === undefined) {
+                                        console.log("Still no data");
+                                        response.json('Still no data');
+                                    } else {
+                                        if (start === '-1' && end === '-1') {
+                                            data = result[0].data;
+                                            console.log('List of users have been send');
+                                            response.json(JSON.stringify(data));
+                                        } else if (start < result[0].data[0].timestamps) {
+                                            console.log('No data between these dates');
+                                            response.json("No data between these dates");
+                                        } else {
+                                            (result[0].data).forEach(periodic_data => {
+                                                if (periodic_data.timestamps >= start && periodic_data.timestamps <= end) {
+                                                    data.push(periodic_data);
+                                                }
+                                            });
+                                            console.log('List of users have been send');
+                                            response.json(JSON.stringify(data));
+                                        }
+                                    }
+                                }
+                            });
+                        }
                     });
-                }
 
 
             } catch (e) {
@@ -525,66 +597,48 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
 
         });
 
-        //Send data of a specific user between two different dates
-        app.post('/databetweentwodates/:token', (request, response, next) => {
+        //Change user to be an Admin
+        app.post('/updatepermission/:token', (request, response, next) => {
 
             try {
                 const decoded = jwt.verify(request.params.token, EMAIL_SECRET);
-                var admin_email = decoded.email
+                var adminEmail = decoded.email
 
-                if (admin_email !== 'buddynsoulmonitor@gmail.com') {
-                    console.log("Not allowed")
-                    response.json('Not allowed');
-                } else {
-                    var db = client.db('buddy&soulmonitor');
+                var post_data = request.body;
+                var newAdminEmail = post_data.email;
+                var allow = post_data.allow
 
-                    var post_data = request.body;
-                    var email = post_data.email;
-                    var start = post_data.start;
-                    var end = post_data.end;
+                var db = client.db('buddy&soulmonitor');
 
-                    db.collection('monitor')
-                        .find({'email': email}, {}).toArray(function (err, result) {
-                        if(err) {
+                db.collection('user')
+                    .findOne({'email': adminEmail}, function (err, user) {
+                        if (err) {
                             console.log(err);
-                            response.json('error');
-                        }
-                        else {
-                            var data = [];
-                            if(result[0].data === undefined) {
-                                console.log("Still no data");
-                                response.json('Still no data');
-                            }
-                            else {
-                                if(start === '-1' && end === '-1') {
-                                    data = result[0].data;
-                                    console.log('List of users have been send');
-                                    response.json(JSON.stringify(data));
-                                }
-                                else if(start < result[0].data[0].timestamps) {
-                                    console.log('No data between these dates');
-                                    response.json("No data between these dates");
-                                }
-                                else {
-                                    (result[0].data).forEach(periodic_data => {
-                                        if(periodic_data.timestamps >= start && periodic_data.timestamps <= end) {
-                                            data.push(periodic_data);
-                                        }
-                                    });
-                                    console.log('List of users have been send');
-                                    response.json(JSON.stringify(data));
-                                }
+                            response.json('Error when finding admin mail in the db');
+                        } else {
+                            if (!user.admin) {
+                                console.log('Not allowed');
+                                response.json("Not allowed");
+                            } else {
+                                db.collection('user')
+                                    .updateOne({'email': newAdminEmail}, //filter
+                                        {$set: {'admin': allow}}
+                                    ).then(() => {
+                                    console.log("User's permission have been updated");
+                                    response.json("User's permission have been updated");
+                                })
+                                    .catch((err) => {
+                                        console.log("Error when updating users's permission");
+                                        response.json("Error when updating user's permission");
+                                    })
                             }
                         }
-                    });
-                }
-
+                    })
 
             } catch (e) {
                 console.log(e);
                 response.json('error');
             }
-
         });
 
 
