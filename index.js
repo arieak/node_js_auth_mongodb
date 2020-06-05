@@ -567,11 +567,11 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                     response.json('error');
                                 } else {
                                     var data = [];
-                                    if (result[0].data === undefined) {
+                                    if (result[0] === undefined) {
                                         console.log("Still no data");
                                         response.json('Still no data');
                                     } else {
-                                        if (start === '-1' && end === '-1') {
+                                        if (start === -1 && end === -1) {
                                             data = result[0].data;
                                             console.log('List of users have been send');
                                             response.json(JSON.stringify(data));
