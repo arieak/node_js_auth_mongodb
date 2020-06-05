@@ -448,7 +448,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
         });
 
         //Change password (the user enters a new password and the password is updated in the db)
-        app.post('/senddata/:token', (request, response, next) => {
+        app.get('/senddata/:token', (request, response, next) => {
 
             try {
                 const decoded = jwt.verify(request.params.token, EMAIL_SECRET);
