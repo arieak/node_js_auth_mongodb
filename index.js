@@ -522,7 +522,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                         data.push(json_user);
                                     });
                                     console.log('List of users have been send');
-                                    response.json(JSON.stringify(data));
+                                    response.json(data);
                                 });
                             }
                         }
@@ -585,7 +585,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                                 }
                                             });
                                             console.log('List of users have been send');
-                                            response.json(JSON.stringify(data));
+                                            response.json(data);
                                         }
                                     }
                                 }
