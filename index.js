@@ -566,7 +566,12 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                 if (err) {
                                     console.log(err);
                                     response.json('error');
-                                } else {
+                                }
+                                else if (result.length === 0) {
+                                    console.log("User's email doesn't exist");
+                                    response.json("User's email doesn't exist")
+                                }
+                                else {
                                     var data = [];
                                     if (result[0].data === undefined) {
                                         console.log("Still no data");
@@ -584,6 +589,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                         else {
                                             (result[0].data).forEach(periodic_data => {
                                                 if (periodic_data.timestamps >= start && periodic_data.timestamps <= end) {
+
                                                     data.push(periodic_data);
                                                 }
                                             });
