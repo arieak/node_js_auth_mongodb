@@ -517,7 +517,8 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                         var json_user = {
                                             'email': user.email,
                                             'name': user.name,
-                                            'registration_date': user.registration_date
+                                            'registration_date': user.registration_date,
+                                            'admin': user.admin
                                         };
                                         data.push(json_user);
                                     });
