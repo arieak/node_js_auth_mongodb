@@ -585,19 +585,25 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                             data = result[0].data;
                                             console.log('List of users have been send');
                                             response.json(data);
-                                        } else if (start < result[0].data[0].timestamps) {
-                                            console.log('No data between these dates');
-                                            response.json("No data between these dates");
                                         }
+                                        // } else if (start < result[0].data[0].timestamps) {
+                                        //     console.log('No data between these dates');
+                                        //     response.json("No data between these dates");
+                                        // }
                                         else {
                                             (result[0].data).forEach(periodic_data => {
                                                 if (periodic_data.timestamps >= start && periodic_data.timestamps <= end) {
-
                                                     data.push(periodic_data);
                                                 }
                                             });
-                                            console.log('Data of user have been send');
-                                            response.json(data);
+                                            if(data.length != 0) {
+                                                console.log('Data of user have been send');
+                                                response.json(data);
+                                            }
+                                            else {
+                                                console.log('No data between these dates');
+                                                response.json("No data between these dates");
+                                            }
                                         }
                                     }
                                 }
