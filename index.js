@@ -565,7 +565,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                             var end = post_data.end;
 
                             db.collection('monitor')
-                                .find({'email': email}, {}).then(function (err, result) {
+                                .find({'email': email}, {}).toArray(function (err, result) {
                                 if (err) {
                                     console.log(err);
                                     response.json('error');
@@ -577,13 +577,13 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                 else {
                                     var data = [];
                                     //if (result[0].data === undefined) {
-                                    if (typeof(result["data"]) === "undefined") {
+                                    if (typeof(result[0]["data"]) === "undefined") {
                                         console.log("Still no data");
                                         response.json('Still no data');
                                     } else {
                                         if (start == -1 && end == -1) {
                                             //data = adaptToJson(result[0].data);
-                                            data = result.data;
+                                            data = result[0].data;
                                             console.log('List of users have been send');
                                             response.json(data);
                                         }
@@ -592,7 +592,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                         //     response.json("No data between these dates");
                                         // }
                                         else {
-                                            (result.data).forEach(periodic_data => {
+                                            (result[0].data).forEach(periodic_data => {
                                                 if (periodic_data.timestamps >= start && periodic_data.timestamps <= end) {
                                                     data.push(periodic_data);
                                                 }
