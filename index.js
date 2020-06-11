@@ -206,6 +206,8 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                         (err, refreshToken) => {
                                             var json_to_send = {
                                                 'refreshToken': refreshToken,
+                                                'name': user.name,
+                                                'registration_date': user.registration_date,
                                                 'admin': user.admin,
                                             }
                                             response.json(json_to_send);
@@ -628,11 +630,11 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                     .findOne({'email': adminEmail}, function (err, user) {
                         if (err) {
                             console.log(err);
-                            response.json('Error when finding admin mail in the db');
+                            response.status(401).json('Error when finding admin mail in the db');
                         } else {
                             if (!user.admin) {
                                 console.log('Not allowed');
-                                response.json("Not allowed");
+                                response.status(401).json("Not allowed");
                             } else {
                                 db.collection('user')
                                     .updateOne({'email': newAdminEmail}, //filter
