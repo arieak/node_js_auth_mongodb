@@ -664,6 +664,55 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
             }
         });
 
+        //Delete user
+        app.post('/deleteuser/:token', (request, response, next) => {
+
+            try {
+                const decoded = jwt.verify(request.params.token, EMAIL_SECRET);
+                var adminEmail = decoded.email
+
+                var post_data = request.body;
+                var userToRemove = post_data.email;
+
+                var db = client.db('buddy&soulmonitor');
+
+                db.collection('user')
+                    .findOne({'email': adminEmail}, function (err, user) {
+                        if (err) {
+                            console.log(err);
+                            response.json('Error when finding admin mail in the db');
+                        } else {
+                            if (!user.admin) {
+                                console.log('Not allowed');
+                                response.json("Not allowed");
+                            } else {
+                                db.collection('user')
+                                    .deleteOne({'email': userToRemove}, function (err,res) {
+                                        if (err) {
+                                            console.log("Failed to remove user");
+                                            response.json("Failed to remove user");
+                                        }
+                                        else {
+                                            if (res.deletedCount === 0) {
+                                                console.log("User email not found");
+                                                response.json("User email not found");
+                                            }
+                                            else {
+                                                console.log("User has been removed");
+                                                response.json("User has been removed");
+                                            }
+                                        }
+                                    })
+                            }
+                        }
+                    })
+
+            } catch (e) {
+                console.log(e);
+                response.json('error');
+            }
+        });
+
         //Contact us message request
         app.post('/contactus/:token', (request, response, next) => {
 
