@@ -449,7 +449,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
             }
         });
 
-        //Change password (the user enters a new password and the password is updated in the db)
+        //Send data from the app to the server
         app.post('/senddata/:token', (request, response, next) => {
 
             try {
@@ -657,6 +657,62 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                             }
                         }
                     })
+
+            } catch (e) {
+                console.log(e);
+                response.json('error');
+            }
+        });
+
+        //Contact us message request
+        app.post('/contactus/:token', (request, response, next) => {
+
+            try {
+                const decoded = jwt.verify(request.params.token, EMAIL_SECRET);
+                var email = decoded.email
+
+                var post_data = request.body;
+                var message = post_data.message;
+
+                message = JSON.parse(message);
+                var timestamps = message.timestamps;
+                var userEmail = message.email;
+                var userSubject = message.subject;
+                var message_body = message.message;
+
+                var db = client.db('buddy&soulmonitor');
+
+                db.collection('user')
+                    .find({'confirmed': true}, {}).toArray(function (err, result) {
+                    if(result.length > 0) {
+                        var mailList = [];
+                        result.forEach(user => {
+                            mailList.push(user.email);
+                        });
+
+                        var subject = 'Contact us notification';
+
+                        var html = `Hi admin, 
+                                                <br>
+                                                <br>
+                                                You received a new message from an user.
+                                                <br>
+                                                <br>
+                                                Date: ${timestamps} <br>
+                                                User: ${userEmail} <br>
+                                                Subject: ${userSubject} <br>
+                                                Message: ${message_body}
+                                                <br>
+                                                <br>
+                                                Buddy&Soul Monitor`;
+
+                        sendMail(mailList, subject, html);
+
+                        response.json('Contact us message have been sent');
+                        console.log('Contact us message have been sent');
+                    }
+                });
+
 
             } catch (e) {
                 console.log(e);
