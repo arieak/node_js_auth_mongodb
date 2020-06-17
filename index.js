@@ -557,8 +557,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                         if (!user.admin) {
                             console.log('Not allowed');
                             response.json("Not allowed");
-                        }
-                        else {
+                        } else {
                             var post_data = request.body;
                             var email = post_data.email;
                             var start = post_data.start;
@@ -569,15 +568,13 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                 if (err) {
                                     console.log(err);
                                     response.json('error');
-                                }
-                                else if (result.length === 0) {
+                                } else if (result.length === 0) {
                                     console.log("User's email doesn't exist");
                                     response.json("User's email doesn't exist")
-                                }
-                                else {
+                                } else {
                                     var data = [];
                                     //if (result[0].data === undefined) {
-                                    if (typeof(result[0]["data"]) === "undefined") {
+                                    if (typeof (result[0]["data"]) === "undefined") {
                                         console.log("Still no data");
                                         response.json('Still no data');
                                     } else {
@@ -587,9 +584,9 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                             console.log('List of users have been send');
                                             response.json(data);
                                         }
-                                        // } else if (start < result[0].data[0].timestamps) {
-                                        //     console.log('No data between these dates');
-                                        //     response.json("No data between these dates");
+                                            // } else if (start < result[0].data[0].timestamps) {
+                                            //     console.log('No data between these dates');
+                                            //     response.json("No data between these dates");
                                         // }
                                         else {
                                             (result[0].data).forEach(periodic_data => {
@@ -597,11 +594,10 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                                     data.push(periodic_data);
                                                 }
                                             });
-                                            if(data.length != 0) {
+                                            if (data.length != 0) {
                                                 console.log('Data of user have been send');
                                                 response.json(data);
-                                            }
-                                            else {
+                                            } else {
                                                 console.log('No data between these dates');
                                                 response.json("No data between these dates");
                                             }
@@ -685,9 +681,25 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                             if (!user.admin) {
                                 console.log('Not allowed');
                                 response.json("Not allowed");
-                            } else {
+                            }
+                            else {
+                                // delete the user from the 'user' collection
                                 db.collection('user')
-                                    .deleteOne({'email': userToRemove}, function (err,res) {
+                                    .deleteOne({'email': userToRemove}, function (err, res) {
+                                        if (err) {
+                                            console.log("Failed to remove user");
+                                            response.json("Failed to remove user");
+                                        } else {
+                                            if (res.deletedCount === 0) {
+                                                console.log("User email not found");
+                                                response.json("User email not found");
+                                            }
+                                        }
+                                    })
+
+                                // delete the user from the 'monitor' collection
+                                db.collection('monitor')
+                                    .deleteOne({'email': userToRemove}, function (err, res) {
                                         if (err) {
                                             console.log("Failed to remove user");
                                             response.json("Failed to remove user");
@@ -697,12 +709,10 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                                 console.log("User email not found");
                                                 response.json("User email not found");
                                             }
-                                            else {
-                                                console.log("User has been removed");
-                                                response.json("User has been removed");
-                                            }
                                         }
                                     })
+                                console.log("User has been removed");
+                                response.json("User has been removed");
                             }
                         }
                     })
@@ -733,7 +743,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
 
                 db.collection('user')
                     .find({'confirmed': true}, {}).toArray(function (err, result) {
-                    if(result.length > 0) {
+                    if (result.length > 0) {
                         var mailList = [];
                         result.forEach(user => {
                             mailList.push(user.email);
