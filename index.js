@@ -616,6 +616,53 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
 
         });
 
+        //Send all the user data
+        app.post('/backupuserdata/:token', (request, response, next) => {
+
+            try {
+                const decoded = jwt.verify(request.params.token, EMAIL_SECRET);
+                var email = decoded.email
+
+                var db = client.db('buddy&soulmonitor');
+
+                //Check exists email
+                db.collection('user')
+                    .findOne({'email': email}, function (err, user) {
+                        if (err) {
+                            console.log('Error');
+                            response.json("Error");
+                        }
+                        else {
+                            db.collection('monitor')
+                                .find({'email': email}, {}).toArray(function (err, result) {
+                                if (err) {
+                                    console.log(err);
+                                    response.json('error');
+                                } else if (result.length === 0) {
+                                    console.log("User's email doesn't exist");
+                                    response.json("User's email doesn't exist")
+                                } else {
+                                    if (typeof (result[0]["data"]) === "undefined") {
+                                        console.log("Still no data");
+                                        response.json('Still no data');
+                                    }
+                                    else {
+                                        var data = result[0].data;
+                                        console.log('Back up of user have been send');
+                                        response.json(data);
+                                    }
+                                }
+                            });
+                        }
+                    });
+
+            } catch (e) {
+                console.log(e);
+                response.json('error');
+            }
+
+        });
+
         //Change user to be an Admin
         app.post('/updatepermission/:token', (request, response, next) => {
 
