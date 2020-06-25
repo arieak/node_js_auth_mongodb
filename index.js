@@ -833,7 +833,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
         });
 
 
-        Start Web Server
+        //Start Web Server
         app.listen(3000, () => {
             console.log('Connected to MongoDB Server, WebService running on port 3000');
         })
