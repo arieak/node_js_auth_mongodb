@@ -838,15 +838,11 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
         //     console.log('Connected to MongoDB Server, WebService running on port 3000');
         // })
 
-        // const port = 3000;
-        // https.createServer(options, app).listen(port, function(){
-        //     // console.log("Express server listening on port " + port);
-        //     console.log('Connected to MongoDB Server, WebService running on port ' + port);
-        // });
-
-        https.createServer(options, function (req, res) {
-            console.log('Connected to MongoDB Server, WebService running on port 3000');
-        }).listen(3000);
+        const port = 3000;
+        https.createServer(options, app).listen(port, function(){
+            // console.log("Express server listening on port " + port);
+            console.log('Connected to MongoDB Server, WebService running on port ' + port);
+        });
 
     }
 })
