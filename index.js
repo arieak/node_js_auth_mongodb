@@ -14,7 +14,7 @@ require("dotenv").config();
 
 var options = {
     key: fs.readFileSync('key.pem', 'utf8'),
-    cert: fs.readFileSync('csr.pem', 'utf8')
+    cert: fs.readFileSync('cert.pem', 'utf8')
 };
 
 const IP_ADDRESS = '3.12.111.177'
