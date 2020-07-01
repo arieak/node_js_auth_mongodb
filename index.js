@@ -499,7 +499,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
         });
 
         //Send list of all confirmed users
-        app.get('/listusers/:token', (request, response, next) => {
+        app.post('/listusers/:token', (request, response, next) => {
 
             try {
                 const decoded = jwt.verify(request.params.token, EMAIL_SECRET);
