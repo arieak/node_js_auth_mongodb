@@ -746,6 +746,15 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                 response.json("Not allowed");
                             }
                             else {
+                                // get user status
+                                var userStatus = false;
+                                db.collection('user')
+                                    .findOne({'email': userToRemove}, function (err, user) {
+                                        if (user.confirmed == true) {
+                                            userStatus = true;
+                                        }
+                                    });
+
                                 // delete the user from the 'user' collection
                                 db.collection('user')
                                     .deleteOne({'email': userToRemove}, function (err, res) {
@@ -760,20 +769,23 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                         }
                                     })
 
-                                // delete the user from the 'monitor' collection
-                                db.collection('monitor')
-                                    .deleteOne({'email': userToRemove}, function (err, res) {
-                                        if (err) {
-                                            console.log("Failed to remove user");
-                                            response.json("Failed to remove user");
-                                        }
-                                        else {
-                                            if (res.deletedCount === 0) {
-                                                console.log("User email not found");
-                                                response.json("User email not found");
+                                if (!userStatus) {
+                                    // delete the user from the 'monitor' collection
+                                    db.collection('monitor')
+                                        .deleteOne({'email': userToRemove}, function (err, res) {
+                                            if (err) {
+                                                console.log("Failed to remove user");
+                                                response.json("Failed to remove user");
                                             }
-                                        }
-                                    })
+                                            else {
+                                                if (res.deletedCount === 0) {
+                                                    console.log("User email not found");
+                                                    response.json("User email not found");
+                                                }
+                                            }
+                                        })
+                                }
+
                                 console.log("User has been removed");
                                 response.json("User has been removed");
                             }
