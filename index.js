@@ -518,8 +518,11 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                 console.log('Not allowed');
                                 response.json("Not allowed");
                             } else {
+                                var post_data = request.body;
+                                var status = post_data.status;
+
                                 db.collection('user')
-                                    .find({'confirmed': true}, {}).toArray(function (err, result) {
+                                    .find({'confirmed': status}, {}).toArray(function (err, result) {
                                     var data = [];
                                     result.forEach(user => {
                                         var json_user = {
