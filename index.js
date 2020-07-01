@@ -519,22 +519,35 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                 response.json("Not allowed");
                             } else {
                                 var post_data = request.body;
-                                var status = Boolean(post_data.status);
+                                var status = post_data.status;
+
+                                if(status == 'true') {
+                                    status = true;
+                                }
+                                else {
+                                    status = false;
+                                }
 
                                 db.collection('user')
                                     .find({'confirmed': status}, {}).toArray(function (err, result) {
                                     var data = [];
-                                    result.forEach(user => {
-                                        var json_user = {
-                                            'email': user.email,
-                                            'name': user.name,
-                                            'registration_date': user.registration_date,
-                                            'admin': user.admin
-                                        };
-                                        data.push(json_user);
-                                    });
-                                    console.log('List of users have been send');
-                                    response.json(data);
+                                    if (typeof (result[0]) === "undefined") {
+                                        console.log("Unconfirmed list is empty");
+                                        response.json('Unconfirmed list is empty');
+                                    }
+                                    else {
+                                        result.forEach(user => {
+                                            var json_user = {
+                                                'email': user.email,
+                                                'name': user.name,
+                                                'registration_date': user.registration_date,
+                                                'admin': user.admin
+                                            };
+                                            data.push(json_user);
+                                        });
+                                        console.log('List of users have been send');
+                                        response.json(data);
+                                    }
                                 });
                             }
                         }
