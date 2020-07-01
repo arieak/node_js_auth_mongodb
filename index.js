@@ -519,7 +519,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                 response.json("Not allowed");
                             } else {
                                 var post_data = request.body;
-                                var status = post_data.status;
+                                var status = Boolean(post_data.status);
 
                                 db.collection('user')
                                     .find({'confirmed': status}, {}).toArray(function (err, result) {
