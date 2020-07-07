@@ -532,7 +532,9 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                                 }
 
                                 db.collection('user')
-                                    .find({'confirmed': status}, {}).toArray(function (err, result) {
+                                    .find({'confirmed': status}, {})
+                                    .sort({name: 1})
+                                    .toArray(function (err, result) {
                                     var data = [];
                                     result.forEach(user => {
                                         var json_user = {
