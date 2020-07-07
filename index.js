@@ -533,6 +533,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
 
                                 db.collection('user')
                                     .find({'confirmed': status}, {})
+                                    .collation({ locale: "en" })
                                     .sort({name: 1})
                                     .toArray(function (err, result) {
                                     var data = [];
