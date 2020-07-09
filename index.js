@@ -8,14 +8,8 @@ var nodemailer = require('nodemailer');
 var jwt = require('jsonwebtoken');
 var ObjectId = require('mongodb').ObjectID;
 var path = require('path');
-// var https = require('https');
 const fs = require('fs');
 require("dotenv").config();
-
-// var options = {
-//     key: fs.readFileSync('key.pem', 'utf8'),
-//     cert: fs.readFileSync('cert.pem', 'utf8')
-// };
 
 const IP_ADDRESS = '3.12.111.177'
 const EMAIL_SECRET = 'asdf1093KMnzxcvnkljvasdu09123nlasdasdf';
@@ -863,12 +857,5 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
         app.listen(3000, () => {
             console.log('Connected to MongoDB Server, WebService running on port 3000');
         })
-
-        // const port = 3000;
-        // https.createServer(options, app).listen(port, function(){
-        //     // console.log("Express server listening on port " + port);
-        //     console.log('Connected to MongoDB Server, WebService running on port ' + port);
-        // });
-
     }
 })
