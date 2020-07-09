@@ -11,8 +11,8 @@ var path = require('path');
 const fs = require('fs');
 require("dotenv").config();
 
-const IP_ADDRESS = '3.12.111.177'
-const EMAIL_SECRET = 'asdf1093KMnzxcvnkljvasdu09123nlasdasdf';
+const IP_ADDRESS = process.env.ip_address;
+const EMAIL_SECRET = process.env.email_secret;
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
