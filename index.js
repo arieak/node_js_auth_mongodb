@@ -952,6 +952,13 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
 
                                     var newEmail = user.new_email;
 
+                                    db.collection('monitor')
+                                        .updateOne({'email': userEmail},
+                                            {
+                                                $set: {'email': newEmail},
+                                            }
+                                        )
+
                                     db.collection('user')
                                         .updateOne({'email': userEmail}, //filter
                                             {
