@@ -632,6 +632,61 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
 
         });
 
+        //Send all user data for stats
+        app.get('/dataallusers/:token', (request, response, next) => {
+
+            try {
+                const decoded = jwt.verify(request.params.token, EMAIL_SECRET);
+                var adminEmail = decoded.email
+
+                var db = client.db('buddy&soulmonitor');
+
+                //Check exists email
+                db.collection('user')
+                    .findOne({'email': adminEmail}, function (err, user) {
+                        if (err) {
+                            console.log('Error');
+                            response.json("Error");
+                        }
+                        if (!user.admin) {
+                            console.log('Not allowed');
+                            response.json("Not allowed");
+                        } else {
+
+                            db.collection('monitor')
+                                .find({}, {}).toArray(function (err, result) {
+                                if (err) {
+                                    console.log(err);
+                                    response.json('error');
+                                } else if (result.length === 0) {
+                                    console.log("No data");
+                                    response.json("No data")
+                                }
+                                else {
+                                    var data = [];
+                                    result.forEach(user => {
+                                        if(user.data !== undefined) {
+                                            data.push({
+                                                'email': user.email,
+                                                'data': user.data
+                                            });
+                                        }
+
+                                    });
+                                    console.log('List of all users have been send');
+                                    response.json(data);
+                                }
+                            });
+                        }
+                    });
+
+            } catch (e) {
+                console.log(e);
+                response.json('error');
+            }
+
+        });
+
         //Send all the user data
         app.post('/backupuserdata/:token', (request, response, next) => {
 
