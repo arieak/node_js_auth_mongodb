@@ -690,6 +690,14 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                 var newAdminEmail = post_data.email;
                 var allow = post_data.allow
 
+                // convert 'allow' variable to boolean type
+                if(allow == 'true') {
+                    allow = true;
+                }
+                else {
+                    allow = false;
+                }
+
                 var db = client.db('buddy&soulmonitor');
 
                 db.collection('user')
