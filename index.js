@@ -736,7 +736,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
 
             try {
                 const decoded = jwt.verify(request.params.token, EMAIL_SECRET);
-                var adminEmail = decoded.email
+                var email = decoded.email
 
                 var post_data = request.body;
                 var userToRemove = post_data.email;
@@ -744,57 +744,60 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
                 var db = client.db('buddy&soulmonitor');
 
                 db.collection('user')
-                    .findOne({'email': adminEmail}, function (err, userToCheck) {
+                    .findOne({'email': email}, function (err, userToCheck) {
                         if (err) {
                             console.log(err);
                             response.json('Error when finding admin mail in the db');
                         } else {
                             if (!userToCheck.admin) {
-                                console.log('Not allowed');
-                                response.json("Not allowed");
-                            }
-                            else {
-                                // get user status
-                                db.collection('user')
-                                    .findOne({'email': userToRemove}, function (err, user) {
-                                        var userStatus = user.confirmed;
+                                // console.log('Not allowed');
+                                // response.json("Not allowed");
 
-                                        // delete the user from the 'user' collection
-                                        db.collection('user')
+                                // if an user wants to remove his account
+                                userToRemove = email;
+                            }
+
+                            // get user status
+                            db.collection('user')
+                                .findOne({'email': userToRemove}, function (err, user) {
+                                    var userStatus = user.confirmed;
+
+                                    // delete the user from the 'user' collection
+                                    db.collection('user')
+                                        .deleteOne({'email': userToRemove}, function (err, res) {
+                                            if (err) {
+                                                console.log("Failed to remove user");
+                                                response.json("Failed to remove user");
+                                            } else {
+                                                if (res.deletedCount === 0) {
+                                                    console.log("User email not found");
+                                                    response.json("User email not found");
+                                                }
+                                            }
+                                        })
+
+                                    if (userStatus) {
+                                        // delete the user from the 'monitor' collection
+                                        db.collection('monitor')
                                             .deleteOne({'email': userToRemove}, function (err, res) {
                                                 if (err) {
                                                     console.log("Failed to remove user");
                                                     response.json("Failed to remove user");
-                                                } else {
+                                                }
+                                                else {
                                                     if (res.deletedCount === 0) {
                                                         console.log("User email not found");
                                                         response.json("User email not found");
                                                     }
                                                 }
                                             })
+                                    }
 
-                                        if (userStatus) {
-                                            // delete the user from the 'monitor' collection
-                                            db.collection('monitor')
-                                                .deleteOne({'email': userToRemove}, function (err, res) {
-                                                    if (err) {
-                                                        console.log("Failed to remove user");
-                                                        response.json("Failed to remove user");
-                                                    }
-                                                    else {
-                                                        if (res.deletedCount === 0) {
-                                                            console.log("User email not found");
-                                                            response.json("User email not found");
-                                                        }
-                                                    }
-                                                })
-                                        }
+                                });
 
-                                    });
+                            console.log("User has been removed");
+                            response.json("User has been removed");
 
-                                console.log("User has been removed");
-                                response.json("User has been removed");
-                            }
                         }
                     })
 
