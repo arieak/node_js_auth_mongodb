@@ -973,7 +973,7 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
 
                                         jwt.sign(
                                             {
-                                                email: userEmail,
+                                                email: newEmail,
                                             },
                                             EMAIL_SECRET,
                                             (err, refreshToken) => {
