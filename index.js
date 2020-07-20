@@ -862,6 +862,152 @@ MongoClient.connect(url, {useNewUrlParser: true}, function (err, client) {
             }
         });
 
+        //Update user email
+        app.post('/sendverificationcode/:token', (request, response, next) => {
+
+            try {
+                const decoded = jwt.verify(request.params.token, EMAIL_SECRET);
+                var userEmail = decoded.email
+
+                var post_data = request.body;
+                var newEmail = post_data.newEmail;
+
+                var db = client.db('buddy&soulmonitor');
+
+                // first we check if the new email is available
+                db.collection('user')
+                    .find({'email': newEmail}).count(function (err, number) {
+                    if (number != 0) {
+                        response.status(409).json('Email already exists');
+                        console.log('Email already exists');
+                    } else {
+                        db.collection('user')
+                            .findOne({'email': userEmail}, function (err, user) {
+                                if (err) {
+                                    console.log(err);
+                                    response.json('Error when finding user mail in the db');
+                                } else {
+                                    var userName = user.name;
+                                    var verificationCode = getRandomString(4); // create 4 random character
+
+                                    db.collection('user')
+                                        .updateOne({'email': userEmail}, //filter
+                                            {
+                                                $set: {
+                                                    'verification_code': verificationCode,
+                                                    'new_email': newEmail
+                                                }
+                                            }
+                                        ).then(async () => {
+                                        var subject = 'Verification code';
+                                        var html = `Hi ${userName},
+                                                    <br>
+                                                    <br>
+                                                    Your verification code is: ${verificationCode}
+                                                    <br>
+                                                    <br>
+                                                    Buddy&Soul Monitor`;
+
+                                        await sendMail(newEmail, subject, html);
+
+                                        response.status(200).json('Verification code have been sent');
+                                        console.log('Verification code have been sent');
+                                    });
+                                }
+                            });
+                    }
+                });
+            } catch (e) {
+                console.log(e);
+                response.json('error');
+            }
+        });
+
+        //Update user email
+        app.post('/updateemail/:token', (request, response, next) => {
+
+            try {
+                const decoded = jwt.verify(request.params.token, EMAIL_SECRET);
+                var userEmail = decoded.email
+
+                var post_data = request.body;
+                var verificationCode = post_data.verificationCode;
+
+                var db = client.db('buddy&soulmonitor');
+
+                db.collection('user')
+                    .findOne({'email': userEmail}, function (err, user) {
+                        if (err) {
+                            console.log(err);
+                            response.json('Error when finding user mail in the db');
+                        }
+                        else {
+                            if (user.verification_code === undefined || user.new_email === undefined) {
+                                console.log('Field does not exist');
+                                response.status(400).json('Field does not exist');
+                            }
+                            else {
+                                if(user.verification_code === verificationCode) {
+                                    // update user email and unset new fields, also send the new refresh token
+
+                                    var newEmail = user.new_email;
+
+                                    db.collection('user')
+                                        .updateOne({'email': userEmail}, //filter
+                                            {
+                                                $set: {'email': newEmail},
+                                                $unset: {'verification_code': 1,
+                                                    'new_email': 1}
+                                            }
+                                        ).then(async () => {
+                                        var subject = 'Email update';
+                                        var html = `Hi ${user.name},
+                                                    <br>
+                                                    <br>
+                                                    Your email have been updated successfully.
+                                                    <br>
+                                                    <br>
+                                                    Buddy&Soul Monitor`;
+
+                                        await sendMail(newEmail, subject, html);
+
+                                        jwt.sign(
+                                            {
+                                                email: userEmail,
+                                            },
+                                            EMAIL_SECRET,
+                                            (err, refreshToken) => {
+                                                var refreshTokenToSend = {
+                                                    'refreshToken': refreshToken,
+                                                }
+                                                response.status(200).json(refreshTokenToSend);
+                                                console.log('Email have been updated');
+                                            },
+                                        );
+                                    });
+                                }
+                                else {
+                                    // verification code is wrong
+                                    db.collection('user')
+                                        .updateOne({'email': userEmail}, //filter
+                                            {
+                                                $unset: {'verification_code': 1,
+                                                    'new_email': 1}
+                                            }
+                                        ).then(() => {
+                                        response.status(400).json('Confirmation code is not correct');
+                                        console.log('Confirmation code is not correct');
+                                    });
+                                }
+                            }
+                        }
+                    });
+            } catch (e) {
+                console.log(e);
+                response.json('error');
+            }
+        });
+
         //Contact us message request
         app.post('/contactus/:token', (request, response, next) => {
 
